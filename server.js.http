@@ -1,0 +1,29 @@
+const http = require("http");
+const fs = require("fs").promises;
+const session = {}; // 세션 저장용 객체
+const sessKey = new Date(); // 키 값
+session[sessKey] = { name: "hi my name is potato" };
+
+const server = http
+  .createServer(async (req, res) => {
+    try {
+      let file = await fs.readFile("./index.html");
+      if (req.url === "/login") {
+        file = await fs.readFile("./login.html");
+      }
+      res.writeHead(200, {
+        "Set-cookie": `session=${sessKey}`,
+      }); // writeHead: 응답에 대한 정보(헤더)를 기록
+      console.log(req.headers.cookie);
+      res.end(file); // end: 요청에 대한 응답을 보내주는, 응답을 종료하는 메서드. 여기에 넣은 파라미터까지 전달하고 응답 종료
+    } catch (error) {
+      console.log(error);
+      res.writeHead(500, {
+        "Content-Type": "index.html; charset=utf-8",
+      });
+      res.end(error.message);
+    }
+  })
+  .listen(4000, () => {
+    console.log("4000포트에서 서버 연결 중...");
+  }); // listen: 클라이언트와 연결할 포트번호와 서버가 연결되면 실행할 콜백함수

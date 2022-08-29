@@ -27,8 +27,8 @@ function App() {
           display: display,
         },
         headers: {
-          "X-Naver-Client-Id": "FSyHYM0S3JX6DSx13tCi",
-          "X-Naver-Client-Secret": "Tf8NaTcLxU",
+          "X-Naver-Client-Id": process.env.REACT_APP_NAVER_CLIENT_KEY,
+          "X-Naver-Client-Secret": process.env.REACT_APP_NAVER_SECRET,
         },
       })
       .then((response) => {

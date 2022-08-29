@@ -1,41 +1,76 @@
-// 1. express 호출
+const morgan = require("morgan");
 const express = require("express");
 const app = express();
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const path = require("path");
-const corsOptions = {
-  origin: "*",
-  Credential: true,
-  withCredentials: true,
-};
 
-// 2. 포트 설정
+const path = require("path");
+
 app.set("port", 4000);
 
-// 3. 공통 사용 미들웨어 장착
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors(corsOptions));
-app.use(bodyParser.json());
-// app.use((req, res) => {
-//   res.header({
-//     "Access-Control-Allow-Origin": "*",
-//     "Access-Control-Allow-Headers":
-//       "Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization",
-//   }); // 모든 도메인 허용
+app.use(morgan("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// app.use(express.static(path.join(__dirname, "public")));
+
+let boardList = [];
+let numOfBoard = 0;
+
+// 라우팅 설정
+app.get("/", (req, res) => {
+  res.send("this is api.js");
+});
+// 게시글 api
+app.get("/board", (req, res) => {
+  res.send(boardList);
+});
+app.post("/board", (req, res) => {
+  const board = {
+    id: ++numOfBoard,
+    user_id: req.body.user_id,
+    date: new Date(),
+    title: req.body.title,
+    content: req.body.content,
+  };
+  boardList.push(board);
+
+  res.redirect("/board");
+});
+app.put("/board/:id", (req, res) => {
+  const findItem = boardList.find((item) => {
+    return item.id == +req.params.id;
+  });
+  const idx = boardList.indexOf(findItem);
+  boardList.splice(idx, 1);
+
+  const board = {
+    id: +req.params.id,
+    user_id: req.params.user_id,
+    date: new Date(),
+    title: req.body.title,
+    content: req.body.content,
+  };
+  v;
+  boardList.push(board);
+  res.redirect("/board");
+});
+app.delete("/board/:id", (req, res) => {
+  const findItem = boardList.find((item) => {
+    return item.id == +req.params.id;
+  });
+  const idx = boardList.indexOf(findItem);
+  boardList.splice(idx, 1);
+
+  res.redirect("/board");
+});
+
+// app.get("/:type", (req, res) => {
+//   let { type } = req.params;
+//   res.send(type);
+// });
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "index.html"));
 // });
 
-// 7. 생성된 서버가 포트를 리스닝
 app.listen(app.get("port"), () => {
   console.log(app.get("port") + "포트에서 서버 실행중");
-}); // 포트 연결, 서버 실행
-
-app.use(express.static(path.join(__dirname, "react-test/build")));
-
-// 4. 라우터 구성
-app.get("/", (req, res, next) => {
-  res.sendFile(path.join(__dirname, "react-test/build/index.html"));
-});
-app.get("*", (req, res, next) => {
-  res.sendFile(path.join(__dirname, "react-test/build/index.html"));
 });
